@@ -32,7 +32,7 @@ function rewrite_iframe_output( $content ) {
 	// Locate and extract all occurances of an iframe (added to array[0][x] (the full iframe match) and array[1][x] (the src contents).
 	preg_match_all( '/.*iframe.*? src="(.*?)".*<\/iframe>/', $content, $iframe_matches );
 	$modified_content_output = $content;
-	$index = 0;
+	$index                   = 0;
 	foreach ( $iframe_matches[0] as $iframe_element ) {
 		$modified_content_output = str_replace( $iframe_element, '<iframe src="about:blank" data-uoe-cookie-src="' . $iframe_matches[1][ $index ] . '" width="560" height="315" frameborder="0" allowfullscreen></iframe>', $modified_content_output );
 		$index++;
@@ -44,11 +44,11 @@ function rewrite_iframe_output( $content ) {
 /**
  * Outputs Google Analytics tracking code information, and respects the user privacy choices made in the EdGEL cookie jar.
  *
- * @return string
+ * @return void
  */
 function output_google_analytics_blocking_code() {
 	$analytics_tracking_code = '';
-	$output = '';
+	$output                  = '';
 	if ( '' !== get_site_option( 'ed_cookie_public_google_analytics_code' ) ) {
 		$analytics_tracking_code = get_site_option( 'ed_cookie_public_google_analytics_code' );
 	}
@@ -82,15 +82,15 @@ function output_google_analytics_blocking_code() {
  *
  * @return void
  */
-add_action( 'admin_menu', 'register_ed_public_cookies_admin_page' );
-function register_ed_public_cookies_admin_page(){
+function register_ed_public_cookies_admin_page() {
 	// Check that the user has the appropriate permissions to view the settings page.
-	if ( !current_user_can( 'manage_options' ) )  {
+	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 	}
-    add_menu_page( 'EdGEL banner', 'EdGEL banner', 'manage_options', 'ed-public-cookies-menu', 'cookie_banner_menu_output', 'dashicons-slides' );
-   	add_action( 'admin_init', 'cookie_banner_register_settings' );
+	add_menu_page( 'EdGEL banner', 'EdGEL banner', 'manage_options', 'ed-public-cookies-menu', 'cookie_banner_menu_output', 'dashicons-slides' );
+	add_action( 'admin_init', 'cookie_banner_register_settings' );
 }
+add_action( 'admin_menu', 'register_ed_public_cookies_admin_page' );
 
 
 /**
@@ -100,20 +100,24 @@ function register_ed_public_cookies_admin_page(){
  */
 function cookie_banner_register_settings() {
 	$analytics_args = array(
-		'type' => 'string',
-		'default' => NULL
+		'type'    => 'string',
+		'default' => null,
 	);
 	register_setting( 'ed-public-cookies-group', 'ed_public_cookies_ga_property', $analytics_args );
 
 	$wrap_iframes_args = array(
-		'type' => 'boolean',
-		'default' => TRUE
+		'type'    => 'boolean',
+		'default' => true,
 	);
 	register_setting( 'ed-public-cookies-group', 'ed_public_cookies_wrap_iframes', $wrap_iframes_args );
 }
 
-function cookie_banner_menu_output() { ?>
-	
+/**
+ * Outputs the banner admin page.
+ *
+ * @return void
+ */
+function cookie_banner_menu_output() { ?>	
 	<div class="wrap">
 		<h2>EdGEL privacy banner settings</h2>
 		<form method="post" action="options.php">
@@ -153,7 +157,7 @@ function cookie_banner_menu_output() { ?>
 
 add_action( 'wp_enqueue_scripts', 'enqueue_edgel_cookie_js' );
 
-if ( get_option( 'ed_public_cookies_wrap_iframes' ) == 1 ) {
+if ( get_option( 'ed_public_cookies_wrap_iframes' ) === 1 ) {
 	add_filter( 'the_content', 'rewrite_iframe_output' );
 }
 
